@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 # System dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,9 +15,10 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
-# SQLite DB File setup if not exists
+# Storage & Database permissions
+RUN mkdir -p database storage bootstrap/cache
 RUN touch database/database.sqlite
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/database
+RUN chmod -R 777 storage bootstrap/cache database
 
-EXPOSE 8000
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
+EXPOSE 10000
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
